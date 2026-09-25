@@ -29,6 +29,8 @@ import { getThemePref, setThemePref, ThemePref } from '../utils/theme';
 
 export const APP_VERSION = '1.0.0';
 export const REPO_URL = 'https://github.com/yumevsn/FLUXA';
+export const WEB_APP_URL = 'https://fluxa-ochre.vercel.app/app/';
+export const RELEASES_URL = 'https://github.com/yumevsn/FLUXA/releases/latest';
 
 const LANGUAGE_KEY = 'fluxa.defaultLanguage';
 
@@ -214,6 +216,18 @@ const Settings = () => {
           <IonItem>
             <IonLabel>Version</IonLabel>
             <IonNote slot="end">{APP_VERSION}</IonNote>
+          </IonItem>
+          <IonItem button detail onClick={() => void openExternal(WEB_APP_URL)}>
+            <IonLabel>
+              Web app
+              <p className="item-sub">fluxa-ochre.vercel.app/app</p>
+            </IonLabel>
+          </IonItem>
+          <IonItem button detail onClick={() => void openExternal(RELEASES_URL)}>
+            <IonLabel>
+              Desktop downloads
+              <p className="item-sub">Windows, macOS and Linux</p>
+            </IonLabel>
           </IonItem>
           <IonItem button detail onClick={() => void openExternal(REPO_URL)}>
             <IonLabel>Source code on GitHub</IonLabel>

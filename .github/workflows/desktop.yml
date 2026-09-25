@@ -1,7 +1,7 @@
 # Builds the FLUXA desktop apps (Tauri) for Windows, macOS and Linux.
 #
-# - Push a tag like v1.0.0 → builds all platforms and creates a DRAFT GitHub
-#   release with the installers attached. Review it, then press "Publish".
+# - Push a tag like v1.0.0 → builds all platforms and publishes a GitHub
+#   release with the installers attached (each platform uploads when it finishes).
 # - Or run it by hand from the Actions tab (workflow_dispatch) to just get the
 #   installers as downloadable build artifacts.
 name: Desktop apps
@@ -71,7 +71,7 @@ jobs:
 
             These builds are not code-signed yet, so Windows SmartScreen and macOS
             Gatekeeper will warn the first time you open them.
-          releaseDraft: true
+          releaseDraft: false
           prerelease: false
           args: ${{ matrix.args }}
 

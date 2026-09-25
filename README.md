@@ -1,5 +1,7 @@
 # FLUXA
 
+**[Open the web app](https://fluxa-ochre.vercel.app/app/)** · [Website](https://fluxa-ochre.vercel.app) · [Download for Windows, macOS & Linux](https://github.com/yumevsn/FLUXA/releases/latest)
+
 FLUXA is a free, open-source app for learning languages with interactive
 flashcards that use text, images, audio and YouTube videos. It works completely
 offline, with no accounts and no servers, and whole decks can be shared as a
@@ -71,8 +73,8 @@ npm run desktop:build    # installers in src-tauri/target/release/bundle/
 ```
 
 **Release builds:** push a version tag and GitHub Actions builds every
-platform. It attaches the installers to a draft release for you to review and
-publish.
+platform and publishes them as a GitHub release. Bump `version` in
+`package.json` first, because the installers take their version number from it.
 
 ```bash
 git tag v1.0.0

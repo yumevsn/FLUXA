@@ -2,17 +2,16 @@
 (function () {
   var ua = navigator.userAgent || '';
   var platform = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '';
-  var os = /android/i.test(ua)
-    ? 'android'
-    : /iphone|ipad|ipod/i.test(ua)
-      ? 'web'
-      : /win/i.test(platform)
-        ? 'windows'
-        : /mac/i.test(platform)
-          ? 'mac'
-          : /linux/i.test(platform)
-            ? 'linux'
-            : 'web';
+  // Phones and tablets use the web app
+  var os = /android|iphone|ipad|ipod/i.test(ua)
+    ? 'web'
+    : /win/i.test(platform)
+      ? 'windows'
+      : /mac/i.test(platform)
+        ? 'mac'
+        : /linux/i.test(platform)
+          ? 'linux'
+          : 'web';
 
   var card = document.querySelector('.dl[data-os="' + os + '"]');
   if (card) card.classList.add('recommended');
