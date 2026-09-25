@@ -37,7 +37,7 @@ const DeckScreen = () => {
     setExporting(true);
     try {
       const fileName = await exportDeck(deckId);
-      toast(`Exported ${fileName}`);
+      if (fileName) toast(`Exported ${fileName}`);
     } catch {
       toast('Export failed. Please try again.');
     } finally {

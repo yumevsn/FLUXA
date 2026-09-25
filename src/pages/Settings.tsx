@@ -24,6 +24,7 @@ import { exportAllDecks } from '../utils/fluxa-export';
 import { FluxaImportError, importFluxaFile } from '../utils/fluxa-import';
 import { deleteAllMedia } from '../utils/media-storage';
 import LanguagePicker from '../components/LanguagePicker';
+import { openExternal } from '../utils/platform';
 import { getThemePref, setThemePref, ThemePref } from '../utils/theme';
 
 export const APP_VERSION = '1.0.0';
@@ -88,7 +89,7 @@ const Settings = () => {
     try {
       const count = await exportAllDecks();
       await hideLoading();
-      toast(count === 0 ? 'No decks to export yet.' : `Exported ${count} ${count === 1 ? 'deck' : 'decks'}`);
+      if (count !== null) toast(count === 0 ? 'No decks to export yet.' : `Exported ${count} ${count === 1 ? 'deck' : 'decks'}`);
     } catch {
       await hideLoading();
       toast('Export failed. Please try again.');
@@ -214,7 +215,7 @@ const Settings = () => {
             <IonLabel>Version</IonLabel>
             <IonNote slot="end">{APP_VERSION}</IonNote>
           </IonItem>
-          <IonItem href={REPO_URL} target="_blank" rel="noopener noreferrer" detail>
+          <IonItem button detail onClick={() => void openExternal(REPO_URL)}>
             <IonLabel>Source code on GitHub</IonLabel>
           </IonItem>
           <IonItem>

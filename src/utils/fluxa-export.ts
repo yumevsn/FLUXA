@@ -4,6 +4,7 @@ import { Directory, Filesystem } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
 import { db, Card, Deck } from '../db/db';
 import { extFromPath, readMedia } from './media-storage';
+import { isDesktopApp } from './platform';
 
 export const FLUXA_VERSION = '1.0';
 
@@ -110,10 +111,27 @@ const blobToBase64 = (blob: Blob): Promise<string> =>
   });
 
 /**
- * Web: trigger a browser download.
- * Native: save to Documents (falls back to cache) and open the share sheet.
+ * Desktop app: "Save as…" dialog. Web: browser download.
+ * Mobile: save to Documents (falls back to cache) and open the share sheet.
+ * Returns false if the user cancelled the save dialog.
  */
-export const deliverFile = async (blob: Blob, fileName: string, title: string) => {
+export const deliverFile = async (blob: Blob, fileName: string, title: string): Promise<boolean> => {
+  if (isDesktopApp()) {
+    const [{ save }, { writeFile }] = await Promise.all([
+      import('@tauri-apps/plugin-dialog'),
+      import('@tauri-apps/plugin-fs'),
+    ]);
+    const ext = fileName.split('.').pop() ?? 'fluxa';
+    const path = await save({
+      title,
+      defaultPath: fileName,
+      filters: [{ name: ext === 'zip' ? 'Zip archive' : 'FLUXA deck', extensions: [ext] }],
+    });
+    if (!path) return false;
+    await writeFile(path, new Uint8Array(await blob.arrayBuffer()));
+    return true;
+  }
+
   if (!Capacitor.isNativePlatform()) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -123,7 +141,7 @@ export const deliverFile = async (blob: Blob, fileName: string, title: string) =
     a.click();
     a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 10_000);
-    return;
+    return true;
   }
 
   const data = await blobToBase64(blob);
@@ -147,17 +165,22 @@ export const deliverFile = async (blob: Blob, fileName: string, title: string) =
   } catch {
     // User dismissed the share sheet — the file is still saved
   }
+  return true;
 };
 
-export const exportDeck = async (deckId: string): Promise<string> => {
+/** Returns the file name, or null if the user cancelled saving. */
+export const exportDeck = async (deckId: string): Promise<string | null> => {
   const { blob, deck } = await buildDeckZip(deckId);
   const fileName = `${safeFileName(deck.name)}.fluxa`;
-  await deliverFile(blob, fileName, `Share ${deck.name}`);
-  return fileName;
+  const saved = await deliverFile(blob, fileName, `Save ${deck.name}`);
+  return saved ? fileName : null;
 };
 
-/** One zip containing every deck as its own .fluxa file. */
-export const exportAllDecks = async (): Promise<number> => {
+/**
+ * One zip containing every deck as its own .fluxa file.
+ * Returns how many decks were exported, or null if the user cancelled saving.
+ */
+export const exportAllDecks = async (): Promise<number | null> => {
   const decks = await db.decks.orderBy('createdAt').toArray();
   if (decks.length === 0) return 0;
   const outer = new JSZip();
@@ -171,6 +194,6 @@ export const exportAllDecks = async (): Promise<number> => {
   }
   const blob = await outer.generateAsync({ type: 'blob', mimeType: 'application/zip' });
   const date = new Date().toISOString().slice(0, 10);
-  await deliverFile(blob, `fluxa-decks-${date}.zip`, 'Share all FLUXA decks');
-  return decks.length;
+  const saved = await deliverFile(blob, `fluxa-decks-${date}.zip`, 'Save all FLUXA decks');
+  return saved ? decks.length : null;
 };

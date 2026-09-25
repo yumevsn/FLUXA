@@ -1,0 +1,59 @@
+name: Share a deck
+description: Submit a FLUXA deck to the community library
+title: '[Deck] '
+labels: ['deck submission']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for sharing a deck! Shared decks will appear in the community library
+        on the FLUXA website so learners anywhere can use them.
+
+        **How to attach your deck:** in FLUXA, open the deck and tap the export button to
+        get a `.fluxa` file. GitHub doesn't accept the `.fluxa` extension, so **rename
+        it to end in `.zip`** (e.g. `market-vocabulary.fluxa.zip`) and drag it into the
+        box below. It's the same file, and FLUXA can still import it.
+  - type: input
+    id: name
+    attributes:
+      label: Deck name
+      placeholder: Brazilian Portuguese: market vocabulary
+    validations:
+      required: true
+  - type: input
+    id: language
+    attributes:
+      label: Language (and dialect, if any)
+      placeholder: Portuguese (Brazilian Portuguese)
+    validations:
+      required: true
+  - type: input
+    id: countries
+    attributes:
+      label: Where is it spoken? (optional)
+      placeholder: Brazil
+  - type: textarea
+    id: description
+    attributes:
+      label: What's in the deck?
+      description: Who is it for, how many cards, and what kinds (text, pictures, audio, YouTube clips)?
+    validations:
+      required: true
+  - type: textarea
+    id: file
+    attributes:
+      label: Deck file
+      description: Drag your `.fluxa.zip` file here (max 25 MB).
+    validations:
+      required: true
+  - type: checkboxes
+    id: rights
+    attributes:
+      label: Sharing rules
+      options:
+        - label: I made this deck, or I have permission to share everything in it (text, pictures, recordings).
+          required: true
+        - label: I agree to share it under the CC BY 4.0 licence, so others can use and adapt it with credit.
+          required: true
+        - label: Any people recorded or photographed have agreed to be shared.
+          required: true

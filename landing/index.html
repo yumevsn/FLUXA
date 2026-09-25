@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FLUXA: learn languages with interactive flashcards</title>
+    <meta
+      name="description"
+      content="FLUXA is a free, open-source app for learning languages with flashcards that use text, images, audio and YouTube clips. Works offline. No account needed."
+    />
+    <meta name="theme-color" content="#2D5A3D" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#141613" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" type="image/png" href="/icon-192.png" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <meta property="og:title" content="FLUXA: learn languages with interactive flashcards" />
+    <meta
+      property="og:description"
+      content="Text, pictures, your own recordings and YouTube clips. Free, open source, offline. No account."
+    />
+    <meta property="og:image" content="/icon-512.png" />
+    <meta property="og:type" content="website" />
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/main.js" defer></script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+
+    <header class="nav">
+      <div class="wrap nav-inner">
+        <a class="brand" href="/" aria-label="FLUXA home">
+          <img src="/icon-192.png" alt="" width="28" height="28" />
+          <span>FLUXA</span>
+        </a>
+        <nav aria-label="Main">
+          <a href="#features">Features</a>
+          <a href="#decks">Community decks</a>
+          <a href="#download">Download</a>
+          <a href="https://github.com/yumevsn/FLUXA" rel="noopener">GitHub</a>
+        </nav>
+        <a class="btn btn-small" href="/app/">Open app</a>
+      </div>
+    </header>
+
+    <main id="main">
+      <!-- Hero -->
+      <section class="hero">
+        <div class="wrap hero-inner">
+          <div class="hero-copy">
+            <p class="eyebrow">Free · Open source · Works offline</p>
+            <h1>Learn a language one card at a time.</h1>
+            <p class="lead">
+              FLUXA helps you learn languages with interactive flashcards. Each card can use
+              text, pictures, your own voice recordings or YouTube clips, so you read, see,
+              hear and watch the language in real use.
+            </p>
+            <div class="cta-row">
+              <a class="btn" href="/app/">Start learning in your browser</a>
+              <a class="btn btn-ghost" href="#download" id="hero-download">Download the app</a>
+            </div>
+            <p class="fine">No account. No ads. Your decks never leave your device unless you share them.</p>
+          </div>
+
+          <div class="hero-visual" aria-hidden="true">
+            <div class="demo-stack">
+              <div class="demo-card demo-under"></div>
+              <div class="demo-card demo-under2"></div>
+              <div class="demo-flip">
+                <div class="demo-face demo-front">
+                  <div class="face-head"><span class="pill">Question</span><span class="kind">Text</span></div>
+                  <div class="demo-word">saudade</div>
+                  <div class="demo-hint">Portuguese</div>
+                </div>
+                <div class="demo-face demo-back">
+                  <div class="face-head"><span class="pill pill-answer">Answer</span><span class="kind">Text</span></div>
+                  <div class="demo-echo">saudade</div>
+                  <div class="demo-answer">A deep longing for something or someone you love and miss.</div>
+                </div>
+              </div>
+            </div>
+            <div class="demo-chip chip-video"><span class="dot"></span> Video clip · 1:24 – 1:40</div>
+            <div class="demo-chip chip-audio"><span class="bars"><i></i><i></i><i></i><i></i></span> Tudo bem?</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Card types -->
+      <section id="features" class="section">
+        <div class="wrap">
+          <h2>Four kinds of cards</h2>
+          <p class="section-lead">Mix them in one deck and learn a word the way you'll meet it in real life.</p>
+          <div class="grid grid-4">
+            <article class="feature">
+              <div class="icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M5 4h14v16H5z" /><path d="M8 9h8M8 13h8M8 17h5" /></svg>
+              </div>
+              <h3>Text</h3>
+              <p>A word or question on the front and the meaning on the back, with example sentences if you like.</p>
+            </article>
+            <article class="feature">
+              <div class="icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" /><circle cx="9" cy="10" r="2" /><path d="M21 16l-5-5-8 8" /></svg>
+              </div>
+              <h3>Pictures</h3>
+              <p>Snap the market stall, the menu or the street sign, then ask yourself what's in it.</p>
+            </article>
+            <article class="feature">
+              <div class="icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3" /><path d="M5 11a7 7 0 0 0 14 0M12 18v3" /></svg>
+              </div>
+              <h3>Audio</h3>
+              <p>Record a friend, a teacher or yourself. Train your ear with real voices and accents.</p>
+            </article>
+            <article class="feature">
+              <div class="icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="4" /><path d="M10 9l5 3-5 3z" /></svg>
+              </div>
+              <h3>YouTube clips</h3>
+              <p>Pick the exact seconds of a scene, song or interview. The card plays just that moment.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- Why -->
+      <section class="section section-alt">
+        <div class="wrap">
+          <h2>Made for real learning</h2>
+          <div class="grid grid-2 why">
+            <div class="why-item">
+              <h3>Flip, check, repeat</h3>
+              <p>
+                Tap to flip, then mark each card “Got it” or “Not yet”. Cards you miss come back
+                later in the session until you know them, and you can practise just those afterwards.
+              </p>
+            </div>
+            <div class="why-item">
+              <h3>Almost every language</h3>
+              <p>
+                Pick from about 8,700 languages and 13,600 dialects: Shona, Zezuru, Brazilian
+                Portuguese, Egyptian Arabic, Latin, even Klingon. Search by country to find what's
+                spoken there.
+              </p>
+            </div>
+            <div class="why-item">
+              <h3>Private and offline</h3>
+              <p>
+                No sign-up and no servers. Everything is stored on your device and works without
+                internet. Only YouTube clips need a connection.
+              </p>
+            </div>
+            <div class="why-item">
+              <h3>One file to share</h3>
+              <p>
+                Export any deck as a single <code>.fluxa</code> file, with its pictures and recordings
+                inside. Send it on WhatsApp, email or Drive. It opens in FLUXA on any device.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Community decks -->
+      <section id="decks" class="section">
+        <div class="wrap">
+          <div class="community">
+            <div>
+              <p class="eyebrow">Community decks</p>
+              <h2>Make a deck. Help someone learn.</h2>
+              <p class="section-lead">
+                The best decks come from people who live the language: the phrases your grandmother
+                uses, the slang from your city, the words you needed at the market. Share yours and
+                it can help a learner anywhere in the world.
+              </p>
+              <ol class="steps">
+                <li><strong>Create</strong> a deck in FLUXA with any mix of text, pictures, audio and clips.</li>
+                <li><strong>Export</strong> it as a <code>.fluxa</code> file from the deck screen.</li>
+                <li>
+                  <strong>Share</strong> it with friends directly, or submit it to the community library
+                  on GitHub so everyone can find it.
+                </li>
+              </ol>
+              <div class="cta-row">
+                <a
+                  class="btn"
+                  href="https://github.com/yumevsn/FLUXA/issues/new?template=share-a-deck.yml"
+                  rel="noopener"
+                  >Share a deck</a
+                >
+                <a class="btn btn-ghost" href="https://github.com/yumevsn/FLUXA/blob/main/CONTRIBUTING.md" rel="noopener"
+                  >How sharing works</a
+                >
+              </div>
+            </div>
+            <div class="library-preview" aria-label="Community library">
+              <div class="library-head">Community library</div>
+              <div class="library-empty">
+                <p><strong>Coming soon.</strong> Shared decks will appear here, searchable by language and country.</p>
+                <p>Be one of the first: submit a deck and it'll be here when the library opens.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Download -->
+      <section id="download" class="section section-alt">
+        <div class="wrap">
+          <h2>Get FLUXA</h2>
+          <p class="section-lead">The same app everywhere. Your decks move between devices as <code>.fluxa</code> files.</p>
+          <div class="grid grid-5 downloads">
+            <a class="dl" data-os="web" href="/app/">
+              <span class="dl-name">Web</span>
+              <span class="dl-desc">Runs in any modern browser. Install it from the address bar to use it offline.</span>
+              <span class="dl-action">Open app →</span>
+            </a>
+            <a class="dl" data-os="windows" href="https://github.com/yumevsn/FLUXA/releases/latest" rel="noopener">
+              <span class="dl-name">Windows</span>
+              <span class="dl-desc">Windows 10 and 11. Small installer, about 2 MB.</span>
+              <span class="dl-action">Download .exe →</span>
+            </a>
+            <a class="dl" data-os="mac" href="https://github.com/yumevsn/FLUXA/releases/latest" rel="noopener">
+              <span class="dl-name">macOS</span>
+              <span class="dl-desc">Apple Silicon and Intel Macs, macOS 10.15 or newer.</span>
+              <span class="dl-action">Download .dmg →</span>
+            </a>
+            <a class="dl" data-os="linux" href="https://github.com/yumevsn/FLUXA/releases/latest" rel="noopener">
+              <span class="dl-name">Linux</span>
+              <span class="dl-desc">AppImage for any distro, plus .deb and .rpm packages.</span>
+              <span class="dl-action">Download →</span>
+            </a>
+            <div class="dl dl-soon" data-os="android">
+              <span class="dl-name">Android</span>
+              <span class="dl-desc">APK for phones and tablets. Until then, open the web app and “Add to Home screen”.</span>
+              <span class="dl-action">Coming soon</span>
+            </div>
+          </div>
+          <p class="fine">
+            On iPhone and iPad, open the web app in Safari, then tap Share and “Add to Home Screen”.
+            Desktop installers aren't code-signed yet, so Windows and macOS may warn you the first time
+            you open them.
+          </p>
+        </div>
+      </section>
+
+      <!-- Open source -->
+      <section class="section">
+        <div class="wrap oss">
+          <div>
+            <h2>Free and open source, for good</h2>
+            <p class="section-lead">
+              FLUXA is MIT-licensed. Anyone can use it, study it, translate it or build on it. The
+              <code>.fluxa</code> format is openly documented so other apps can read your decks too.
+            </p>
+          </div>
+          <div class="cta-row">
+            <a class="btn" href="https://github.com/yumevsn/FLUXA" rel="noopener">View on GitHub</a>
+            <a class="btn btn-ghost" href="https://github.com/yumevsn/FLUXA/blob/main/SPEC.md" rel="noopener">Read the file format</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="wrap footer-inner">
+        <div class="brand">
+          <img src="/icon-192.png" alt="" width="22" height="22" />
+          <span>FLUXA</span>
+        </div>
+        <p>No accounts. No servers. Just learning.</p>
+        <nav aria-label="Footer">
+          <a href="/app/">Open app</a>
+          <a href="https://github.com/yumevsn/FLUXA" rel="noopener">GitHub</a>
+          <a href="https://github.com/yumevsn/FLUXA/blob/main/LICENSE" rel="noopener">MIT licence</a>
+        </nav>
+      </div>
+    </footer>
+  </body>
+</html>

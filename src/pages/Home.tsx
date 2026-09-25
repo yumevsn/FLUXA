@@ -121,7 +121,7 @@ const Home = () => {
   const handleExport = async (deck: Deck) => {
     try {
       const fileName = await exportDeck(deck.id);
-      toast(`Exported ${fileName}`);
+      if (fileName) toast(`Exported ${fileName}`);
     } catch {
       toast('Export failed. Please try again.');
     }

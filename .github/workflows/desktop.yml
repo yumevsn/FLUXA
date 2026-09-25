@@ -1,0 +1,90 @@
+# Builds the FLUXA desktop apps (Tauri) for Windows, macOS and Linux.
+#
+# - Push a tag like v1.0.0 → builds all platforms and creates a DRAFT GitHub
+#   release with the installers attached. Review it, then press "Publish".
+# - Or run it by hand from the Actions tab (workflow_dispatch) to just get the
+#   installers as downloadable build artifacts.
+name: Desktop apps
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: windows-latest
+            args: ''
+          - platform: macos-latest # Apple Silicon
+            args: '--target aarch64-apple-darwin'
+          - platform: macos-latest # Intel Macs
+            args: '--target x86_64-apple-darwin'
+          - platform: ubuntu-22.04
+            args: ''
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Linux system libraries
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+
+      - run: npm ci
+
+      - uses: tauri-apps/tauri-action@v0
+        id: tauri
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # Only create a release when building from a version tag
+          tagName: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || '' }}
+          releaseName: 'FLUXA ${{ github.ref_name }}'
+          releaseBody: |
+            Download the installer for your computer:
+            - **Windows:** `FLUXA_x.y.z_x64-setup.exe` (or the `.msi`)
+            - **macOS (Apple Silicon):** `FLUXA_x.y.z_aarch64.dmg`
+            - **macOS (Intel):** `FLUXA_x.y.z_x64.dmg`
+            - **Linux:** `.AppImage` (any distro), `.deb` (Debian/Ubuntu) or `.rpm` (Fedora)
+
+            These builds are not code-signed yet, so Windows SmartScreen and macOS
+            Gatekeeper will warn the first time you open them.
+          releaseDraft: true
+          prerelease: false
+          args: ${{ matrix.args }}
+
+      - name: Upload installers (manual runs)
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: fluxa-${{ matrix.platform }}${{ matrix.args && '-' || '' }}${{ contains(matrix.args, 'aarch64') && 'arm64' || contains(matrix.args, 'x86_64') && 'x64' || '' }}
+          path: |
+            src-tauri/target/**/release/bundle/**/*.exe
+            src-tauri/target/**/release/bundle/**/*.msi
+            src-tauri/target/**/release/bundle/**/*.dmg
+            src-tauri/target/**/release/bundle/**/*.AppImage
+            src-tauri/target/**/release/bundle/**/*.deb
+            src-tauri/target/**/release/bundle/**/*.rpm
+          if-no-files-found: ignore

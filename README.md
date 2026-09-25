@@ -52,6 +52,36 @@ Netlify or GitHub Pages. Once deployed it can be installed from Chrome or Edge
 ("Install app"), from Android ("Add to Home screen") and from iOS Safari (Share →
 "Add to Home Screen").
 
+## Desktop app (Windows, macOS, Linux)
+
+The desktop app uses [Tauri 2](https://tauri.app). It runs the same web app
+inside the system's own web engine: WebView2 on Windows, WebKit on macOS and
+Linux. Installers are small (under 10 MB), it starts fast and uses little
+memory.
+
+**Download:** see [Releases](https://github.com/yumevsn/FLUXA/releases).
+
+**Build it yourself.** You need [Rust](https://rustup.rs) and, on Windows, the
+Visual Studio C++ Build Tools. See Tauri's
+[prerequisites](https://tauri.app/start/prerequisites/).
+
+```bash
+npm run desktop:dev      # run the desktop app with hot reload
+npm run desktop:build    # installers in src-tauri/target/release/bundle/
+```
+
+**Release builds:** push a version tag and GitHub Actions builds every
+platform. It attaches the installers to a draft release for you to review and
+publish.
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+The desktop app saves exported decks with a normal "Save as…" dialog and opens
+links in your browser. Your decks are stored in the app's own data folder.
+
 ## Build for Android and iOS
 
 FLUXA uses [Capacitor](https://capacitorjs.com/) 5.

@@ -1068,3 +1068,17 @@ ion-label .item-sub {
   line-height: 1.5;
   margin: 6px 0 0;
 }
+
+/* Desktop / wide windows: keep content in a centred, readable column */
+@media (min-width: 1000px) {
+  ion-content.ion-padding {
+    --padding-start: max(24px, calc(50% - 460px));
+    --padding-end: max(24px, calc(50% - 460px));
+  }
+  ion-list.list-inset {
+    margin-inline: max(16px, calc(50% - 460px));
+  }
+  .stack {
+    max-width: none;
+  }
+}

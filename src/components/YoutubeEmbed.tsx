@@ -7,6 +7,7 @@ import {
   getYouTubeId,
   getYouTubeStartTime,
 } from '../utils/youtube';
+import { openExternal } from '../utils/platform';
 
 /**
  * YouTube player for a card. Starts (and optionally stops) at the times saved
@@ -17,7 +18,16 @@ const YoutubeEmbed = ({ url }: { url: string }) => {
   const id = getYouTubeId(url);
   if (!id) {
     return (
-      <a href={url} target="_blank" rel="noopener noreferrer">
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          void openExternal(url);
+        }}
+      >
         Open video ↗
       </a>
     );
@@ -36,6 +46,8 @@ const YoutubeEmbed = ({ url }: { url: string }) => {
         key={plays}
         src={`https://www.youtube-nocookie.com/embed/${id}?${params}`}
         title="YouTube video"
+        // YouTube refuses to play embeds that send no referrer (error 153)
+        referrerPolicy="strict-origin-when-cross-origin"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
       />

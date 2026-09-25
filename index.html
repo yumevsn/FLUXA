@@ -10,13 +10,7 @@
     <link rel="apple-touch-icon" href="/icon-192.png" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <title>FLUXA</title>
-    <script>
-      // Apply the saved theme before first paint (see src/utils/theme.ts)
-      try {
-        var t = localStorage.getItem('fluxa.theme');
-        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
-      } catch (e) {}
-    </script>
+    <script src="/theme-init.js"></script>
   </head>
   <body>
     <div id="root"></div>

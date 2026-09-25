@@ -1,0 +1,67 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "FLUXA",
+  "version": "../package.json",
+  "identifier": "io.fluxa.desktop",
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:8100",
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "FLUXA",
+        "width": 1100,
+        "height": 780,
+        "minWidth": 360,
+        "minHeight": 560,
+        "center": true,
+        "resizable": true,
+        "visible": false,
+        "backgroundColor": "#F5F3EE",
+        "dragDropEnabled": false
+      }
+    ],
+    "security": {
+      "csp": {
+        "default-src": "'self'",
+        "script-src": "'self'",
+        "style-src": "'self' 'unsafe-inline'",
+        "img-src": "'self' data: blob: https://img.youtube.com https://i.ytimg.com",
+        "media-src": "'self' data: blob:",
+        "font-src": "'self' data:",
+        "frame-src": "https://www.youtube-nocookie.com https://www.youtube.com https://www.google.com https://consent.youtube.com https://consent.google.com https://accounts.google.com",
+        "connect-src": "'self' data: blob: ipc: http://ipc.localhost"
+      }
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "category": "Education",
+    "shortDescription": "Learn languages with interactive flashcards",
+    "longDescription": "FLUXA helps you learn languages with interactive flashcards that use text, images, audio and YouTube videos. Everything stays on your device and works offline. No accounts, no servers.",
+    "publisher": "FLUXA",
+    "copyright": "© 2026 Tana Mungombe and FLUXA contributors. MIT licence.",
+    "homepage": "https://fluxa-ochre.vercel.app",
+    "license": "MIT",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser"
+      }
+    },
+    "macOS": {
+      "minimumSystemVersion": "10.15"
+    }
+  }
+}

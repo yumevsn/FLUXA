@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { IonButton, IonIcon } from '@ionic/react';
 import { play, stopwatchOutline } from 'ionicons/icons';
 import {
@@ -6,55 +6,9 @@ import {
   getYouTubeEndTime,
   getYouTubeId,
   getYouTubeStartTime,
-  getYouTubeThumbnail,
   parseTime,
   withYouTubeTimes,
 } from '../utils/youtube';
-
-// Minimal typing for the parts of the YouTube IFrame Player API we use
-interface YTPlayer {
-  getCurrentTime(): number;
-  getDuration(): number;
-  seekTo(seconds: number, allowSeekAhead: boolean): void;
-  playVideo(): void;
-  pauseVideo(): void;
-  cueVideoById(opts: { videoId: string; startSeconds?: number }): void;
-  destroy(): void;
-}
-interface YTNamespace {
-  Player: new (
-    el: HTMLElement,
-    opts: {
-      videoId: string;
-      host?: string;
-      playerVars?: Record<string, number | string>;
-      events?: { onReady?: () => void };
-    }
-  ) => YTPlayer;
-}
-type YTWindow = Window & { YT?: YTNamespace; onYouTubeIframeAPIReady?: () => void };
-
-let apiLoading: Promise<YTNamespace> | null = null;
-
-const loadYouTubeApi = (): Promise<YTNamespace> => {
-  apiLoading ??= new Promise<YTNamespace>((resolve, reject) => {
-    const w = window as YTWindow;
-    if (w.YT?.Player) return resolve(w.YT);
-    const previous = w.onYouTubeIframeAPIReady;
-    w.onYouTubeIframeAPIReady = () => {
-      previous?.();
-      resolve(w.YT!);
-    };
-    const script = document.createElement('script');
-    script.src = 'https://www.youtube.com/iframe_api';
-    script.onerror = () => {
-      apiLoading = null;
-      reject(new Error('YouTube player unavailable'));
-    };
-    document.head.appendChild(script);
-  });
-  return apiLoading;
-};
 
 interface Props {
   url: string;
@@ -65,66 +19,94 @@ interface Props {
 /**
  * Plays the video inline so the learner can pause at the right moment and
  * capture the exact start (and optional end) time into the link.
- * Falls back to typing times when the player can't load (e.g. offline).
+ *
+ * Talks to the embedded player over its postMessage channel (what YouTube's
+ * iframe_api script does internally) instead of loading that script: no extra
+ * download, and it keeps working where www.youtube.com redirects to a cookie
+ * consent page (e.g. the desktop app's fresh web view).
+ * Typing the times still works if the player can't load (e.g. offline).
  */
 const YoutubeClipEditor = ({ url, onChange }: Props) => {
   const id = getYouTubeId(url);
   const start = getYouTubeStartTime(url);
   const end = getYouTubeEndTime(url);
 
-  const host = useRef<HTMLDivElement>(null);
-  const player = useRef<YTPlayer | null>(null);
+  const frame = useRef<HTMLIFrameElement>(null);
   const [ready, setReady] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const readyRef = useRef(false);
   const [now, setNow] = useState(0);
+  const nowRef = useRef(0);
+  const stopAt = useRef(0);
   const [startText, setStartText] = useState(start ? formatTime(start) : '');
   const [endText, setEndText] = useState(end ? formatTime(end) : '');
   const [error, setError] = useState<string | null>(null);
-  const stopAt = useRef<number>(0);
 
   // Keep the text fields in step when the link changes from outside
   useEffect(() => setStartText(start ? formatTime(start) : ''), [start]);
   useEffect(() => setEndText(end ? formatTime(end) : ''), [end]);
 
-  // Create the player once per video
-  useEffect(() => {
-    if (!id) return;
-    let cancelled = false;
-    setReady(false);
-    loadYouTubeApi()
-      .then((YT) => {
-        if (cancelled || !host.current) return;
-        const target = document.createElement('div');
-        host.current.replaceChildren(target);
-        player.current = new YT.Player(target, {
-          videoId: id,
-          host: 'https://www.youtube-nocookie.com',
-          playerVars: { start, playsinline: 1, rel: 0, modestbranding: 1 },
-          events: { onReady: () => !cancelled && setReady(true) },
-        });
-      })
-      .catch(() => !cancelled && setFailed(true));
-    return () => {
-      cancelled = true;
-      player.current?.destroy();
-      player.current = null;
-    };
-    // Only re-create when the video itself changes, not when times change
+  // The player is built once per video. Changing the times must not reload it,
+  // so the start time is only read when the video itself changes.
+  const src = useMemo(() => {
+    if (!id) return '';
+    const params = new URLSearchParams({
+      enablejsapi: '1',
+      origin: window.location.origin,
+      start: String(start),
+      playsinline: '1',
+      rel: '0',
+    });
+    return `https://www.youtube-nocookie.com/embed/${id}?${params}`;
   }, [id]);
 
-  // Live position readout, and stop at the end time when previewing the clip
+  const post = (message: object) =>
+    frame.current?.contentWindow?.postMessage(
+      JSON.stringify({ ...message, id: 1, channel: 'widget' }),
+      '*'
+    );
+  const command = (func: string, args: unknown[] = []) => post({ event: 'command', func, args });
+
+  // Listen for the player's state updates (current time, ready)
   useEffect(() => {
-    if (!ready) return;
-    const timer = window.setInterval(() => {
-      const t = player.current?.getCurrentTime() ?? 0;
-      setNow(t);
-      if (stopAt.current && t >= stopAt.current) {
-        player.current?.pauseVideo();
-        stopAt.current = 0;
+    readyRef.current = false;
+    setReady(false);
+    const onMessage = (e: MessageEvent) => {
+      if (e.source !== frame.current?.contentWindow) return;
+      let data: { event?: string; info?: { currentTime?: number } | null };
+      try {
+        data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
+      } catch {
+        return;
       }
+      if (!readyRef.current && (data.event === 'onReady' || data.event === 'initialDelivery' || data.info)) {
+        readyRef.current = true;
+        setReady(true);
+      }
+      const t = data.info?.currentTime;
+      if (typeof t === 'number') {
+        nowRef.current = t;
+        setNow(t);
+        if (stopAt.current && t >= stopAt.current) {
+          command('pauseVideo');
+          stopAt.current = 0;
+        }
+      }
+    };
+    window.addEventListener('message', onMessage);
+    return () => window.removeEventListener('message', onMessage);
+  }, [id]);
+
+  // Once the embed has loaded, ask it to start sending updates
+  const handleLoad = () => {
+    let tries = 0;
+    const timer = window.setInterval(() => {
+      if (readyRef.current || tries++ > 40) {
+        window.clearInterval(timer);
+        return;
+      }
+      post({ event: 'listening' });
     }, 250);
-    return () => window.clearInterval(timer);
-  }, [ready]);
+  };
 
   if (!id) return null;
 
@@ -148,26 +130,30 @@ const YoutubeClipEditor = ({ url, onChange }: Props) => {
   };
 
   const captureCurrent = (which: 'start' | 'end') => {
-    const t = Math.floor(player.current?.getCurrentTime() ?? 0);
+    const t = Math.floor(nowRef.current);
     if (which === 'start') apply(t, end && end <= t ? 0 : end);
     else apply(start, t);
   };
 
   const playClip = () => {
-    player.current?.seekTo(start, true);
-    player.current?.playVideo();
+    command('seekTo', [start, true]);
+    command('playVideo');
     stopAt.current = end;
   };
 
   return (
     <div className="clip-editor">
-      {failed ? (
-        <img className="image-preview" src={getYouTubeThumbnail(id)} alt="Video thumbnail" />
-      ) : (
-        <div className="youtube-embed">
-          <div ref={host} className="clip-player" />
-        </div>
-      )}
+      <div className="youtube-embed">
+        <iframe
+          ref={frame}
+          src={src}
+          title="YouTube video"
+          onLoad={handleLoad}
+          referrerPolicy="strict-origin-when-cross-origin"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        />
+      </div>
 
       <div className="clip-now">
         {ready ? (
@@ -175,10 +161,10 @@ const YoutubeClipEditor = ({ url, onChange }: Props) => {
             Video is at <strong>{formatTime(now)}</strong>. Pause where the question starts, then tap{' '}
             <em>Use current time</em>.
           </>
-        ) : failed ? (
-          'The player could not load (are you offline?). You can still type the times.'
-        ) : (
+        ) : navigator.onLine ? (
           'Loading player…'
+        ) : (
+          'You are offline, so the video can’t play. You can still type the times.'
         )}
       </div>
 

@@ -21,9 +21,12 @@ import Settings from './pages/Settings';
 
 setupIonicReact({ mode: 'md' });
 
+// "/app" on the website, "" in the desktop and mobile apps (see vite.config.ts)
+const ROUTER_BASE = import.meta.env.BASE_URL.replace(/\/$/, '');
+
 const App = () => (
   <IonApp>
-    <IonReactRouter>
+    <IonReactRouter basename={ROUTER_BASE}>
       <IonTabs>
         <IonRouterOutlet>
           <Route exact path="/" component={Home} />
