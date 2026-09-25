@@ -5,7 +5,7 @@
   "buildCommand": "npm run build:site",
   "outputDirectory": "site-dist",
   "cleanUrls": true,
-  "rewrites": [{ "source": "/app/:path*", "destination": "/app/index.html" }],
+  "rewrites": [{ "source": "/app/:path*", "destination": "/app/" }],
   "headers": [
     {
       "source": "/app/assets/(.*)",
