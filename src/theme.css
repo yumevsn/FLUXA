@@ -719,6 +719,36 @@ button.surface-card:focus-visible {
 .flip-card.animating .face-back {
   transform: rotateY(180deg);
 }
+/* Swap faces exactly when the card is edge-on (the 50% keyframe = 90°).
+   Iframes ignore backface-visibility, so the face turning away is hidden too. */
+.flip-card.anim-to-back .face-front,
+.flip-card.anim-to-front .face-back {
+  animation: face-leave 520ms linear both;
+}
+.flip-card.anim-to-back .face-back,
+.flip-card.anim-to-front .face-front {
+  animation: face-arrive 520ms linear both;
+}
+@keyframes face-leave {
+  0%,
+  49.9% {
+    visibility: visible;
+  }
+  50%,
+  100% {
+    visibility: hidden;
+  }
+}
+@keyframes face-arrive {
+  0%,
+  49.9% {
+    visibility: hidden;
+  }
+  50%,
+  100% {
+    visibility: visible;
+  }
+}
 .flip-card.anim-to-back {
   animation: flip-to-back 520ms cubic-bezier(0.3, 0.7, 0.25, 1) both;
 }
@@ -850,11 +880,15 @@ button.surface-card:focus-visible {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .flip-card,
   .flip-scene,
   .review-notice {
     transition: none;
     animation: none;
+  }
+  /* Flip instantly (the animation must still run so it can end) */
+  .flip-card.animating,
+  .flip-card.animating .card-face {
+    animation-duration: 1ms !important;
   }
 }
 

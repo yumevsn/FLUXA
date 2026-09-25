@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   IonBackButton,
@@ -60,6 +60,8 @@ const AddCard = () => {
   const [recording, setRecording] = useState<Recording | null>(null);
   const [youtubeUrl, setYoutubeUrl] = useState('');
   const [saving, setSaving] = useState(false);
+  // Blocks a second tap immediately, before the "saving" state re-renders
+  const savingRef = useRef(false);
 
   const chooseType = (t: CardType | null) => {
     setType(t);
@@ -105,7 +107,8 @@ const AddCard = () => {
   };
 
   const save = async () => {
-    if (!type || !canSave) return;
+    if (!type || !canSave || savingRef.current) return;
+    savingRef.current = true;
     setSaving(true);
     const input: NewCard = { type, front, back };
     if (type === 'image' && image) input.media = { base64: image.dataUrl, ext: image.ext };
@@ -117,6 +120,7 @@ const AddCard = () => {
       done();
     } catch {
       present({ message: 'Could not save the card. Please try again.', duration: 3000 });
+      savingRef.current = false;
       setSaving(false);
     }
   };

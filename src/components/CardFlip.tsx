@@ -59,43 +59,38 @@ interface Props {
   stackDepth?: number;
 }
 
-export const FLIP_MS = 520;
-
 /**
  * Two-sided review card that turns over in 3D. Tap the card (or press Space /
  * the Flip button) to turn it; tap again to see the question.
- * The face turned away is hidden once it is edge-on, so embedded video and
- * audio never show through from behind.
+ *
+ * The turn is driven entirely by CSS (see .anim-to-back / .anim-to-front in
+ * theme.css): the faces swap exactly when the card is edge-on, and the card
+ * settles when the animation ends. No timers, so it stays in sync even when
+ * the device is slow. At rest the card lies flat and the turned-away face is
+ * hidden, because Chrome won't paint iframes (YouTube) inside a 3D face.
  * Give it a new `key` per review step so the next card starts face up.
  */
 const CardFlip = ({ card, flipped, onToggle, showHint, position, stackDepth = 0 }: Props) => {
-  const [hidden, setHidden] = useState<'front' | 'back'>(flipped ? 'front' : 'back');
   const [anim, setAnim] = useState<'to-back' | 'to-front' | null>(null);
   const shown = useRef(flipped); // side currently facing up
-  const halfway = useRef<number>();
-  const done = useRef<number>();
 
   useEffect(() => {
     if (shown.current === flipped) return; // mount (and StrictMode re-run): no turn
     shown.current = flipped;
-    window.clearTimeout(halfway.current);
-    window.clearTimeout(done.current);
-    // The card is only 3D while it turns. At rest it lies flat, because Chrome
-    // won't paint iframes (YouTube) inside a hidden-backface 3D face.
     setAnim(flipped ? 'to-back' : 'to-front');
-    // Swap which face is hidden at the moment the card is edge-on
-    halfway.current = window.setTimeout(() => setHidden(flipped ? 'front' : 'back'), FLIP_MS / 2);
-    done.current = window.setTimeout(() => setAnim(null), FLIP_MS);
-    return () => {
-      window.clearTimeout(halfway.current);
-      window.clearTimeout(done.current);
-    };
   }, [flipped]);
+
+  // At rest, hide whichever face is turned away. While turning, CSS decides.
+  const hidden = anim ? null : flipped ? 'front' : 'back';
+  const onAnimationEnd = (e: React.AnimationEvent) => {
+    if (e.target === e.currentTarget) setAnim(null);
+  };
 
   return (
     <div className={`flip-scene stack-${Math.min(stackDepth, 2)}`}>
       <div
         className={`flip-card ${anim ? `animating anim-${anim}` : ''}`}
+        onAnimationEnd={onAnimationEnd}
         onClick={onToggle}
         role="button"
         tabIndex={0}
