@@ -6,9 +6,9 @@ the app** itself.
 ## Share a deck
 
 Decks made by people who live a language are the heart of FLUXA: everyday
-phrases, local slang, the words you need at the market. Shared decks will be
-listed in the community library on [the FLUXA website](https://fluxa-ochre.vercel.app),
-searchable by language and country.
+phrases, local slang, the words you need at the market. Shared decks are listed
+in the [community library](https://fluxa-ochre.vercel.app/library), searchable by
+language and country, and anyone can open them in FLUXA with one tap.
 
 1. **Make the deck in FLUXA.** Any mix of text, pictures, audio and YouTube clips
    works.
@@ -19,7 +19,8 @@ searchable by language and country.
    `.zip` (for example `market-vocabulary.fluxa.zip`) and attach it. It's the
    same file.
 
-A maintainer checks each deck before it's published.
+A maintainer checks each deck before it's published. How decks are stored and
+added is described in [decks/README.md](decks/README.md).
 
 ### Deck guidelines
 
@@ -53,6 +54,7 @@ Useful commands:
 | `npm run desktop:dev` | Desktop app (needs Rust, see README) |
 | `npm run build:site` | Landing page + web app, as deployed on Vercel |
 | `npm run languages` | Rebuild the language catalogue |
+| `npm run decks:check` | Validate the community decks in `decks/` |
 
 FLUXA deliberately has no accounts and no servers. Please open an issue to
 discuss bigger features before building them. Changes to the `.fluxa` format

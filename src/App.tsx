@@ -18,6 +18,7 @@ import AddCard from './pages/AddCard';
 import CardDetail from './pages/CardDetail';
 import ReviewMode from './pages/ReviewMode';
 import Settings from './pages/Settings';
+import ImportFromLink from './components/ImportFromLink';
 
 setupIonicReact({ mode: 'md' });
 
@@ -27,6 +28,7 @@ const ROUTER_BASE = import.meta.env.BASE_URL.replace(/\/$/, '');
 const App = () => (
   <IonApp>
     <IonReactRouter basename={ROUTER_BASE}>
+      <ImportFromLink />
       <IonTabs>
         <IonRouterOutlet>
           <Route exact path="/" component={Home} />

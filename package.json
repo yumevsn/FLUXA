@@ -14,7 +14,8 @@
     "desktop:dev": "tauri dev",
     "desktop:build": "tauri build",
     "tauri": "tauri",
-    "build:site": "tsc && node scripts/build-site.mjs"
+    "build:site": "tsc && node scripts/build-site.mjs",
+    "decks:check": "node scripts/build-library.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^5.0.0",

@@ -26,6 +26,36 @@ const toMs = (v: unknown): number => {
   return Number.isNaN(t) ? Date.now() : t;
 };
 
+export interface FluxaSummary {
+  name: string;
+  language: string;
+  cardCount: number;
+}
+
+/** Read a .fluxa file's name, language and card count without importing it. */
+export const peekFluxaFile = async (file: Blob | ArrayBuffer): Promise<FluxaSummary> => {
+  let zip: JSZip;
+  try {
+    zip = await JSZip.loadAsync(file);
+  } catch {
+    throw new FluxaImportError(INVALID_FILE);
+  }
+  const deckFile = zip.file('deck.json');
+  if (!deckFile) throw new FluxaImportError(INVALID_FILE);
+  let parsed: FluxaDeckJson;
+  try {
+    parsed = JSON.parse(await deckFile.async('string'));
+  } catch {
+    throw new FluxaImportError(DAMAGED_FILE);
+  }
+  if (!parsed?.deck || !Array.isArray(parsed.cards)) throw new FluxaImportError(INVALID_FILE);
+  return {
+    name: str(parsed.deck.name).trim() || 'Imported deck',
+    language: str(parsed.deck.language).trim(),
+    cardCount: parsed.cards.length,
+  };
+};
+
 /** Import one .fluxa file (a zip containing deck.json + images/ + audio/). */
 export const importFluxaFile = async (file: Blob | ArrayBuffer): Promise<ImportResult> => {
   // 1. Unzip

@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Community decks · FLUXA</title>
+    <meta
+      name="description"
+      content="Free flashcard decks shared by learners and native speakers. Download them or open them straight in FLUXA. Search by language, dialect or country."
+    />
+    <meta name="theme-color" content="#2D5A3D" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#141613" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" type="image/png" href="/icon-192.png" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <meta property="og:title" content="FLUXA community decks" />
+    <meta property="og:description" content="Free flashcard decks for languages most apps ignore, shared by the people who speak them." />
+    <meta property="og:image" content="/icon-512.png" />
+    <meta property="og:type" content="website" />
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/library.js" defer></script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+
+    <header class="nav">
+      <div class="wrap nav-inner">
+        <a class="brand" href="/" aria-label="FLUXA home">
+          <img src="/icon-192.png" alt="" width="28" height="28" />
+          <span>FLUXA</span>
+        </a>
+        <nav aria-label="Main">
+          <a href="/#demo">How it works</a>
+          <a href="/#features">Features</a>
+          <a href="/library" aria-current="page">Community decks</a>
+          <a href="/#download">Download</a>
+          <a href="https://github.com/yumevsn/FLUXA" rel="noopener">GitHub</a>
+        </nav>
+        <a class="btn btn-small" href="/app/">Open app</a>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="library-hero">
+        <div class="wrap">
+          <p class="eyebrow">Community library</p>
+          <h1 class="library-title">Decks shared by learners and speakers</h1>
+          <p class="section-lead">
+            Free decks for everyday phrases, local slang and the words you actually need. Open one in
+            FLUXA with a tap, or download the <code>.fluxa</code> file to use offline and share.
+          </p>
+          <div class="cta-row">
+            <a class="btn" href="https://github.com/yumevsn/FLUXA/issues/new?template=share-a-deck.yml" rel="noopener"
+              >Share your deck</a
+            >
+            <a class="btn btn-ghost" href="https://github.com/yumevsn/FLUXA/blob/main/CONTRIBUTING.md" rel="noopener"
+              >How sharing works</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <section class="section library-section" id="library">
+        <div class="wrap">
+          <div class="library-controls">
+            <label class="search">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="M20 20l-3.5-3.5" /></svg>
+              <input
+                id="library-search"
+                type="search"
+                placeholder="Search by deck, language, dialect or country"
+                autocomplete="off"
+                aria-label="Search decks"
+              />
+            </label>
+            <div class="lang-filter" id="library-languages" role="group" aria-label="Filter by language"></div>
+          </div>
+          <p class="library-count" id="library-count" aria-live="polite">Loading decks…</p>
+          <div class="deck-grid" id="library-grid"></div>
+          <div class="library-empty-state" id="library-empty" hidden>
+            <h2>No decks match yet</h2>
+            <p>
+              Nobody has shared a deck for that yet. If you speak it, yours could be the first. Every
+              deck helps someone learn.
+            </p>
+            <a class="btn" href="https://github.com/yumevsn/FLUXA/issues/new?template=share-a-deck.yml" rel="noopener"
+              >Share a deck</a
+            >
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="wrap footer-inner">
+        <div class="brand">
+          <img src="/icon-192.png" alt="" width="22" height="22" />
+          <span>FLUXA</span>
+        </div>
+        <p>Shared decks are free to use under their stated licence.</p>
+        <nav aria-label="Footer">
+          <a href="/app/">Open app</a>
+          <a href="https://github.com/yumevsn/FLUXA" rel="noopener">GitHub</a>
+          <a href="https://github.com/yumevsn/FLUXA/blob/main/LICENSE" rel="noopener">MIT licence</a>
+        </nav>
+      </div>
+    </footer>
+  </body>
+</html>

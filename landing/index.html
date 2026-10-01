@@ -21,6 +21,7 @@
     <meta property="og:type" content="website" />
     <link rel="stylesheet" href="/styles.css" />
     <script src="/main.js" defer></script>
+    <script src="/library.js" defer></script>
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
@@ -34,7 +35,7 @@
         <nav aria-label="Main">
           <a href="#demo">How it works</a>
           <a href="#features">Features</a>
-          <a href="#decks">Community decks</a>
+          <a href="/library">Community decks</a>
           <a href="#download">Download</a>
           <a href="https://github.com/yumevsn/FLUXA" rel="noopener">GitHub</a>
         </nav>
@@ -246,11 +247,14 @@
               </div>
             </div>
             <div class="library-preview" aria-label="Community library">
-              <div class="library-head">Community library</div>
-              <div class="library-empty">
-                <p><strong>Coming soon.</strong> Shared decks will appear here, searchable by language and country.</p>
-                <p>Be one of the first: submit a deck and it'll be here when the library opens.</p>
+              <div class="library-head">
+                <span>Community library</span>
+                <span class="library-head-count" id="library-preview-count"></span>
               </div>
+              <div class="library-list" id="library-preview-list">
+                <p class="library-preview-note">Loading decks…</p>
+              </div>
+              <a class="library-browse" href="/library">Browse all decks →</a>
             </div>
           </div>
         </div>

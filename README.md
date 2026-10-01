@@ -15,6 +15,8 @@ single `.fluxa` file that anyone can import on any device.
 - Review mode with a two-sided 3D card flip, a Flip button and keyboard
   shortcuts (Space flips, ← is Not yet, → is Got it). "Not yet" cards go to the
   end of the queue, and you can practise only the missed cards afterwards.
+- A [community library](https://fluxa-ochre.vercel.app/library) of shared decks.
+  Open one in FLUXA with one tap, or download it. See [decks/](decks/README.md).
 - Light, dark or system theme.
 - Export a deck as a `.fluxa` file. It downloads on desktop and opens the
   share sheet on mobile.
