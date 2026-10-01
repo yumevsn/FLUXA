@@ -21,13 +21,13 @@ import { createRequire } from 'node:module';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const JSZip = createRequire(import.meta.url)('jszip');
 
-const DECKS_DIR = join(root, 'decks');
-const MAX_BYTES = 25 * 1024 * 1024;
+export const DECKS_DIR = join(root, 'decks');
+export const MAX_BYTES = 25 * 1024 * 1024;
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const CARD_TYPES = ['text', 'image', 'audio', 'youtube'];
 
 /** Language name → countries (ISO 3166 codes), including dialects/varieties via their parent. */
-const loadLanguageCountries = () => {
+export const loadLanguageCountries = () => {
   const data = JSON.parse(readFileSync(join(root, 'src/data/languages.json'), 'utf8'));
   const byName = new Map();
   for (const row of data.langs) {
@@ -48,8 +48,11 @@ const loadLanguageCountries = () => {
   };
 };
 
-const readDeck = async (slug) => {
-  const file = join(DECKS_DIR, `${slug}.fluxa`);
+/**
+ * Check one .fluxa file. Returns { json, size, types, sample, problems }; it is
+ * valid when `problems` is empty. Also used by scripts/deck-submission.mjs.
+ */
+export const validateDeckFile = async (file) => {
   const problems = [];
   const size = statSync(file).size;
   if (size > MAX_BYTES) problems.push(`is ${(size / 1048576).toFixed(1)} MB (max 25 MB)`);
@@ -121,7 +124,7 @@ export async function buildLibrary(outDir) {
   for (const slug of slugs) {
     const problems = [];
     if (!SLUG.test(slug)) problems.push('file name must be lowercase-with-dashes.fluxa');
-    const deck = await readDeck(slug);
+    const deck = await validateDeckFile(join(DECKS_DIR, `${slug}.fluxa`));
     const meta = readMeta(slug);
     problems.push(...deck.problems, ...meta.problems);
     if (problems.length) {

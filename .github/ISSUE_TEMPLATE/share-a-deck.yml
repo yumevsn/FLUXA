@@ -13,11 +13,14 @@ body:
         get a `.fluxa` file. GitHub doesn't accept the `.fluxa` extension, so **rename
         it to end in `.zip`** (e.g. `market-vocabulary.fluxa.zip`) and drag it into the
         box below. It's the same file, and FLUXA can still import it.
+
+        Your deck is checked automatically as soon as you submit, and you'll get a reply
+        here within a minute. Once a maintainer approves it, it's added to the library for you.
   - type: input
     id: name
     attributes:
       label: Deck name
-      placeholder: Brazilian Portuguese: market vocabulary
+      placeholder: 'Brazilian Portuguese: market vocabulary'
     validations:
       required: true
   - type: input
@@ -46,6 +49,12 @@ body:
       description: Drag your `.fluxa.zip` file here (max 25 MB).
     validations:
       required: true
+  - type: input
+    id: credit
+    attributes:
+      label: Credit me as (optional)
+      description: The name shown on your deck in the library. Leave empty to use your GitHub username.
+      placeholder: e.g. Tana M.
   - type: checkboxes
     id: rights
     attributes:

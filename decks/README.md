@@ -42,14 +42,26 @@ file itself.
 
 ## Adding a submitted deck (maintainers)
 
-1. Download the `.fluxa.zip` attached to the issue and rename it to
-   `<name>.fluxa`.
-2. Open it in FLUXA and check it: the language is correct, there's nothing
-   harmful, and the pictures and recordings are OK to share.
-3. Add it here with its `.json` file. Credit the author and use the date you
-   add it.
-4. Run `npm run decks:check`. It validates every deck: that it's a proper
-   FLUXA file, that its media files are present, that it's under 25 MB, and
-   that the credit file is filled in.
-5. Commit with `Closes #<issue number>`. The site rebuilds and the deck
-   appears in the library.
+This is automated by [.github/workflows/deck-submissions.yml](../.github/workflows/deck-submissions.yml):
+
+1. **Someone submits a deck** through the "Share a deck" form. Within a minute
+   the Action downloads the attached file, runs the same checks as the site
+   build, and replies on the issue. The issue gets the label
+   `ready for review` with a summary of the deck, or `needs changes` with a
+   list of what to fix. Editing the issue re-runs the check.
+2. **You review it.** Download the attachment, open it in FLUXA, and check the
+   language is right, nothing is harmful, and the pictures and recordings are
+   OK to share.
+3. **Add the `approved` label.** The Action adds the deck and its credit file
+   here, commits to `main` with `Closes #<issue>`, comments with the library
+   link, and labels the issue `published`. The site redeploys on its own.
+
+The deck is credited to the name the submitter gave, or to their GitHub
+username, under CC BY 4.0. To change its tags or credit, edit its `.json` file
+here.
+
+### Adding a deck by hand
+
+1. Put `<name>.fluxa` and `<name>.json` in this folder, using the format above.
+2. Run `npm run decks:check` to validate every deck.
+3. Commit and push. The deck appears in the library after the next deploy.

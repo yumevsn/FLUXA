@@ -1,0 +1,97 @@
+# Community deck submissions ("Share a deck" issues).
+#
+# 1. When a submission is opened or edited, the attached deck is downloaded and
+#    checked, and the result is posted on the issue (labels: ready for review /
+#    needs changes).
+# 2. When a maintainer adds the `approved` label, the deck is added to decks/,
+#    committed to main (closing the issue) and the site redeploys.
+#
+# Issue text is untrusted: it only ever reaches scripts/deck-submission.mjs via
+# environment variables and is never interpolated into shell commands.
+name: Deck submissions
+
+on:
+  issues:
+    types: [opened, edited, labeled]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  check:
+    if: >-
+      (github.event.action == 'opened' || github.event.action == 'edited') &&
+      github.event.issue.state == 'open' &&
+      (startsWith(github.event.issue.title, '[Deck]') || contains(github.event.issue.labels.*.name, 'deck submission'))
+    runs-on: ubuntu-latest
+    concurrency:
+      group: deck-check-${{ github.event.issue.number }}
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      # Only jszip is needed; skip install scripts and native builds
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Check the deck
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_AUTHOR: ${{ github.event.issue.user.login }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/deck-submission.mjs check
+
+  publish:
+    if: >-
+      github.event.action == 'labeled' &&
+      github.event.label.name == 'approved' &&
+      github.event.issue.state == 'open' &&
+      (startsWith(github.event.issue.title, '[Deck]') || contains(github.event.issue.labels.*.name, 'deck submission'))
+    runs-on: ubuntu-latest
+    # One at a time, so two approvals can't race to push
+    concurrency:
+      group: deck-publish
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Add the deck to decks/
+        id: add
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_AUTHOR: ${{ github.event.issue.user.login }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/deck-submission.mjs publish
+      - name: Commit and push
+        env:
+          DECK_SLUG: ${{ steps.add.outputs.slug }}
+          DECK_NAME: ${{ steps.add.outputs.name }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          APPROVER: ${{ github.actor }}
+          BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "decks/$DECK_SLUG.fluxa" "decks/$DECK_SLUG.json"
+          printf 'Add community deck: %s\n\nApproved by @%s.\n\nCloses #%s\n' "$DECK_NAME" "$APPROVER" "$ISSUE_NUMBER" > "$RUNNER_TEMP/msg"
+          git commit -F "$RUNNER_TEMP/msg"
+          for i in 1 2 3; do
+            git pull --rebase origin "$BRANCH" && git push origin "HEAD:$BRANCH" && exit 0
+            sleep 5
+          done
+          exit 1
+      - name: Tell the submitter
+        env:
+          DECK_SLUG: ${{ steps.add.outputs.slug }}
+          DECK_NAME: ${{ steps.add.outputs.name }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/deck-submission.mjs announce

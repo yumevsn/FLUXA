@@ -19,8 +19,9 @@ language and country, and anyone can open them in FLUXA with one tap.
    `.zip` (for example `market-vocabulary.fluxa.zip`) and attach it. It's the
    same file.
 
-A maintainer checks each deck before it's published. How decks are stored and
-added is described in [decks/README.md](decks/README.md).
+Your deck is checked automatically within a minute and you get a reply on the
+issue. Once a maintainer approves it, it's added to the library for you. How
+decks are stored and added is described in [decks/README.md](decks/README.md).
 
 ### Deck guidelines
 
