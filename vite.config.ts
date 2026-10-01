@@ -1,6 +1,9 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
+import { readFileSync } from 'node:fs';
+
+const { version } = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8'));
 
 // The web app is served from /app/ on the website (see scripts/build-site.mjs);
 // the desktop and mobile apps serve it from the root.
@@ -8,6 +11,8 @@ const base = process.env.FLUXA_BASE ?? '/';
 
 export default defineConfig({
   base,
+  // Shown in Settings > About; always matches package.json
+  define: { __APP_VERSION__: JSON.stringify(version) },
   plugins: [
     react(),
     VitePWA({

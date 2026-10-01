@@ -27,7 +27,7 @@ import LanguagePicker from '../components/LanguagePicker';
 import { openExternal } from '../utils/platform';
 import { getThemePref, setThemePref, ThemePref } from '../utils/theme';
 
-export const APP_VERSION = '1.0.0';
+export const APP_VERSION = __APP_VERSION__;
 export const REPO_URL = 'https://github.com/yumevsn/FLUXA';
 export const WEB_APP_URL = 'https://fluxa-ochre.vercel.app/app/';
 export const RELEASES_URL = 'https://github.com/yumevsn/FLUXA/releases/latest';

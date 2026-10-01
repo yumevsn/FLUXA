@@ -86,31 +86,49 @@ git push origin v1.0.0
 The desktop app saves exported decks with a normal "Save as…" dialog and opens
 links in your browser. Your decks are stored in the app's own data folder.
 
-## Build for Android and iOS
+## Android app
 
-FLUXA uses [Capacitor](https://capacitorjs.com/) 5.
+The Android app uses [Capacitor](https://capacitorjs.com/) 5. The project is in
+`android/` and runs on Android 6.0 and newer. **Download:** the
+`FLUXA_x.y.z_android.apk` file on [Releases](https://github.com/yumevsn/FLUXA/releases).
+
+**Build it yourself.** You need JDK 17 and the Android SDK (installing
+Android Studio is the easiest way).
 
 ```bash
 npm run build
-npx cap add android      # first time only
 npx cap sync android
-npx cap open android     # opens Android Studio → Run / Build APK
+cd android
+./gradlew assembleDebug     # app/build/outputs/apk/debug/app-debug.apk
 ```
 
-```bash
-# macOS with Xcode only
-npm run build
-npx cap add ios          # first time only
-npx cap sync ios
-npx cap open ios
-```
+`npx cap open android` opens the project in Android Studio instead.
 
-After `cap add`, add the permissions the camera and microphone need:
+**Release signing.** `./gradlew assembleRelease` signs the APK with the
+release key from either:
 
-- **Android** (`android/app/src/main/AndroidManifest.xml`):
-  `CAMERA`, `RECORD_AUDIO`, `READ_MEDIA_IMAGES`.
-- **iOS** (`ios/App/App/Info.plist`): `NSCameraUsageDescription`,
-  `NSPhotoLibraryUsageDescription`, `NSMicrophoneUsageDescription`.
+- `android/keystore.properties` (git-ignored), with `storeFile`,
+  `storePassword`, `keyAlias` and `keyPassword`; or
+- the environment variables `FLUXA_KEYSTORE_FILE`, `FLUXA_KEYSTORE_PASSWORD`,
+  `FLUXA_KEY_ALIAS` and `FLUXA_KEY_PASSWORD`.
+
+Release builds on GitHub take the key from four repository secrets:
+`ANDROID_KEYSTORE_BASE64` (the keystore file, base64-encoded),
+`ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS` and `ANDROID_KEY_PASSWORD`.
+Every release must be signed with **the same key**, otherwise phones refuse to
+install the update. Back the key up and never commit it.
+
+The version name and code come from `version` in `package.json`.
+
+**Patched plugin.** `patches/` holds a small fix for `@capacitor/share` 5 so it
+works on Android 14 and newer. `npm install` applies it automatically through
+`patch-package`.
+
+## iOS
+
+Not built yet. Capacitor can build it on a Mac with Xcode (`npx cap add ios`).
+It needs `NSCameraUsageDescription`, `NSPhotoLibraryUsageDescription` and
+`NSMicrophoneUsageDescription` in `ios/App/App/Info.plist`.
 
 ## The .fluxa file format
 

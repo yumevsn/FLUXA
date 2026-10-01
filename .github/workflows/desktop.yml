@@ -1,10 +1,14 @@
-# Builds the FLUXA desktop apps (Tauri) for Windows, macOS and Linux.
+# Builds the FLUXA apps: desktop (Tauri) for Windows, macOS and Linux, and the
+# Android APK (Capacitor).
 #
-# - Push a tag like v1.0.0 → builds all platforms and publishes a GitHub
-#   release with the installers attached (each platform uploads when it finishes).
-# - Or run it by hand from the Actions tab (workflow_dispatch) to just get the
-#   installers as downloadable build artifacts.
-name: Desktop apps
+# - Push a tag like v1.0.0 → builds everything and publishes a GitHub release
+#   with the installers and the APK attached.
+# - Or run it by hand from the Actions tab (workflow_dispatch) to just get them
+#   as downloadable build artifacts.
+#
+# The APK is signed with the release key from these repository secrets:
+#   ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD
+name: Release apps
 
 on:
   push:
@@ -68,6 +72,7 @@ jobs:
             - **macOS (Apple Silicon):** `FLUXA_x.y.z_aarch64.dmg`
             - **macOS (Intel):** `FLUXA_x.y.z_x64.dmg`
             - **Linux:** `.AppImage` (any distro), `.deb` (Debian/Ubuntu) or `.rpm` (Fedora)
+            - **Android:** `FLUXA_x.y.z_android.apk`. Open it on your phone and allow installing from your browser when asked.
 
             These builds are not code-signed yet, so Windows SmartScreen and macOS
             Gatekeeper will warn the first time you open them.
@@ -88,3 +93,85 @@ jobs:
             src-tauri/target/**/release/bundle/**/*.deb
             src-tauri/target/**/release/bundle/**/*.rpm
           if-no-files-found: ignore
+
+  android:
+    # After the desktop jobs, so the release already exists to upload into
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: gradle
+
+      - run: npm ci
+
+      - name: Build the web app and copy it into the Android project
+        run: |
+          npm run build
+          npx cap sync android
+
+      - name: Release signing key
+        id: key
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          IS_TAG: ${{ startsWith(github.ref, 'refs/tags/') }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/release.jks"
+            echo "signed=true" >> "$GITHUB_OUTPUT"
+          elif [ "$IS_TAG" = "true" ]; then
+            echo "::error::Add the ANDROID_KEYSTORE_* repository secrets to sign release APKs (see README)."
+            exit 1
+          else
+            echo "::warning::No signing key, so this builds a debug APK instead."
+            echo "signed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build the APK
+        working-directory: android
+        env:
+          FLUXA_KEYSTORE_FILE: ${{ steps.key.outputs.signed == 'true' && format('{0}/release.jks', runner.temp) || '' }}
+          FLUXA_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          FLUXA_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          FLUXA_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          SIGNED: ${{ steps.key.outputs.signed }}
+        run: |
+          chmod +x gradlew
+          VERSION=$(node -p "require('../package.json').version")
+          if [ "$SIGNED" = "true" ]; then
+            ./gradlew assembleRelease --no-daemon
+            APK=app/build/outputs/apk/release/app-release.apk
+            OUT="FLUXA_${VERSION}_android.apk"
+          else
+            ./gradlew assembleDebug --no-daemon
+            APK=app/build/outputs/apk/debug/app-debug.apk
+            OUT="FLUXA_${VERSION}_android-debug.apk"
+          fi
+          BUILD_TOOLS=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
+          "$BUILD_TOOLS/apksigner" verify --print-certs "$APK" | head -3
+          mkdir -p "$RUNNER_TEMP/out"
+          cp "$APK" "$RUNNER_TEMP/out/$OUT"
+          rm -f "$RUNNER_TEMP/release.jks"
+
+      - name: Attach the APK to the release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+        run: gh release upload "$TAG" "$RUNNER_TEMP"/out/*.apk --clobber --repo "$GITHUB_REPOSITORY"
+
+      - name: Upload the APK (manual runs)
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: fluxa-android
+          path: ${{ runner.temp }}/out/*.apk

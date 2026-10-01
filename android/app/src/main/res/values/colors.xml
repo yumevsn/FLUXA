@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- FLUXA palette (see src/theme.css) -->
+    <color name="colorPrimary">#2D5A3D</color>
+    <color name="colorPrimaryDark">#2D5A3D</color>
+    <color name="colorAccent">#2D5A3D</color>
+    <color name="splashBackground">#F5F3EE</color>
+</resources>
